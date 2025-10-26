@@ -23,5 +23,15 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to parse csv file: %v", err)
 	}
-	fmt.Println(lines)
+	fmt.Print(lines)
+	var input string
+	for n, l := range lines {
+		fmt.Printf("\nQuestion Number #%d: %v ", n, l[0])
+		fmt.Scanf("%s\n", &input)
+		if input == l[1] {
+			fmt.Println("Correct")
+		} else {
+			fmt.Printf("Incorrect, the answer is: %v\n", l[1])
+		}
+	}
 }
