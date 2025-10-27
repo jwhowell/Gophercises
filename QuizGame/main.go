@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -13,7 +14,12 @@ type Quiz struct {
 }
 
 func main() {
-	file, err := os.Open("problems.csv")
+	var filename string
+	flag.StringVar(&filename, "Filename", "problems.csv", "Filepath to quiz csv, format Q,A")
+
+	flag.Parse()
+
+	file, err := os.Open(filename)
 	if err != nil {
 		log.Fatalf("error reading csv %v", err)
 	}
@@ -26,7 +32,7 @@ func main() {
 	fmt.Print(lines)
 	var input string
 	for n, l := range lines {
-		fmt.Printf("\nQuestion Number #%d: %v ", n, l[0])
+		fmt.Printf("\nQuestion Number #%d: %v ", n+1, l[0])
 		fmt.Scanf("%s\n", &input)
 		if input == l[1] {
 			fmt.Println("Correct")
