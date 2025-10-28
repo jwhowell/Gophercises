@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
 )
 
 type Quiz struct {
@@ -14,12 +15,12 @@ type Quiz struct {
 }
 
 func main() {
-	var filename string
-	flag.StringVar(&filename, "Filename", "problems.csv", "Filepath to quiz csv, format Q,A")
+	filename := flag.String("Filename", "problems.csv", "Filepath to quiz csv, format Q,A")
+	timeLimit := flag.Int("Limit", 30, "Enter a time limit (seconds) for the quiz, default 30 seconds")
 
 	flag.Parse()
 
-	file, err := os.Open(filename)
+	file, err := os.Open(*filename)
 	if err != nil {
 		log.Fatalf("error reading csv %v", err)
 	}
@@ -30,18 +31,28 @@ func main() {
 		log.Fatalf("Failed to parse csv file: %v", err)
 	}
 	fmt.Print(lines)
-	var input string
+	timer := time.NewTimer(time.Duration(*timeLimit) * time.Second)
 	var correct int
 	for n, l := range lines {
 		fmt.Printf("\nQuestion Number #%d: %v ", n+1, l[0])
-		fmt.Scanf("%s\n", &input)
-		if input == l[1] {
-			fmt.Println("Correct")
-			correct++
-		} else {
-			fmt.Printf("Incorrect, the answer is: %v\n", l[1])
+		answerCh := make(chan string)
+		go func() {
+			var answer string
+			fmt.Scanf("%s\n", &answer)
+			answerCh <- answer
+		}()
+		select {
+		case <-timer.C:
+			fmt.Printf("%d correct out of %d", correct, len(lines))
+			return
+		case answer := <-answerCh:
+			if answer == l[1] {
+				fmt.Println("Correct")
+				correct++
+			} else {
+				fmt.Printf("Incorrect, the answer is: %v\n", l[1])
+			}
 		}
 	}
 
-	fmt.Printf("%d correct out of %d", correct, len(lines))
 }
