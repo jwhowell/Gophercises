@@ -31,13 +31,17 @@ func main() {
 	}
 	fmt.Print(lines)
 	var input string
+	var correct int
 	for n, l := range lines {
 		fmt.Printf("\nQuestion Number #%d: %v ", n+1, l[0])
 		fmt.Scanf("%s\n", &input)
 		if input == l[1] {
 			fmt.Println("Correct")
+			correct++
 		} else {
 			fmt.Printf("Incorrect, the answer is: %v\n", l[1])
 		}
 	}
+
+	fmt.Printf("%d correct out of %d", correct, len(lines))
 }
